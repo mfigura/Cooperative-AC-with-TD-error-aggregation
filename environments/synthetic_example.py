@@ -26,7 +26,7 @@ class Synthetic_example(gym.Env):
         '''
         Computes a new state given the current state and action
         Arguments: state and action
-        Returns: new state
+        Returns: new local state, local reward
         '''
         prob = np.zeros(self.n_agents)
         reward = np.zeros(self.n_agents)

@@ -7,7 +7,7 @@ from tensorflow import keras
 from tensorflow.keras import Input, Model, Sequential, layers
 import pandas as pd
 
-'This file contains a function for training networked AC agents in custom multi-agent gym environments.'
+'This file contains a function for training agents that employ the decentralized AC algorithm with TD error agregation in custom multi-agent gym environments.'
 
 def train_batch(env,agents,args):
     '''
@@ -32,7 +32,6 @@ def train_batch(env,agents,args):
     rewards = np.zeros((n_agents,n_episodes,max_ep_len,1))
     TDE_matrices = np.zeros((n_agents,max(buffer_size,1),n_agents,update_frequency*max_ep_len,1))
 
-    obs_check = np.array([[0,0],[0,1],[1,0],[1,1]])
     writer = tf.summary.create_file_writer(logdir = args['summary_dir'])
 
     t = 0
@@ -52,10 +51,6 @@ def train_batch(env,agents,args):
             observations[:,t,j+1], rewards[:,t,j,0], done, _ = env.step(actions[:,t,j])
             ep_returns += rewards[:,t,j]*(gamma**j)
             j += 1
-
-        #print("Observations: "+str(observations))
-        #print("Actions: "+str(actions))
-        #print("Rewards: "+str(rewards))
 
         'SUMMARY OF THE TRAINING EPISODE'
         mean_true_returns = np.mean(ep_returns)
@@ -80,9 +75,6 @@ def train_batch(env,agents,args):
 
         'ALGORITHM UPDATES'
         if ((t+1) % update_frequency) == 0:
-            #print("Action probabilities: "+str(agents[1].actor.predict(obs_check)))
-            print("Cumulated average: "+str(cum_avg))
-            cum_avg = 0
             print("Updating algorithm...")
             states = observations[:,t+1-update_frequency:t+1,:-1].reshape(n_agents,-1,n_observations)
             new_states = observations[:,t+1-update_frequency:t+1,1:].reshape(n_agents,-1,n_observations)

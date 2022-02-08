@@ -5,15 +5,14 @@ from tensorflow import keras
 class DAC_agent():
     '''
     DECENTRALIZED ACTOR-CRITIC AGENT
-    This is an implementation of the decentralized actor-critic (DAC) algorithm with TD error fusion from Figura et al. (2021).
-    The algorithm is a realization of temporal difference learning with one-step lookahead. It is an instance of decentralized
-    cooperative learning, where each agent receives a local reward and observes the local state and action. The DAC agent seeks
-    to maximize a team-average objective function. To achieve that, the agents aggregate TD errors from the network. The communication
-    between the agents is assumed to be delayed such that agents receive full information from the network in k steps. The DAC agent
-    employs neural networks to approximate the actor and critic.
+    This is an implementation of the decentralized actor-critic (DAC) algorithm with TD error aggregation from Cooperative Actor-critic with TD Error Aggregation by Figura et al. (2022).
+    The algorithm is a realization of temporal difference learning with one-step lookahead. It is an instance of decentralized cooperative learning, where each agent receives a local
+    reward and observes the local state and action. The DAC agent seeks to maximize a team-average objective function. To achieve that, the agents aggregate TD errors from the network.
+    The communication between the agents is assumed to be delayed such that agents receive full information from the network in K steps. The DAC agent employs neural networks
+    to approximate the actor and critic.
 
-    Our implementation assumes that the actor and critic updates are performed on separate timescales. Both the actor and critic
-    updates are applied using batch stochastic gradient descent. The algorithm updates are described below.
+    Our implementation assumes that the actor and critic updates are performed on separate timescales. Both the actor and critic updates are applied using batch stochastic gradient descent.
+    The algorithm updates are described below.
 
     1) Action sampling - get_action()
     The agent samples an action at a given state from the current policy.
@@ -28,14 +27,14 @@ class DAC_agent():
     The critic is trained over a number of epochs in which the TD targets are periodically re-evaluated.
 
     5) TD error matrix update - TDE_matrix_update()
-    The agent evaluates the team-average TD error(s) delayed by k steps. Furthermore, it updates the local TD error matrix with the most recent TD error(s).
+    The agent evaluates the team-average TD error(s) delayed by K steps. Furthermore, it updates the local TD error matrix with the most recent TD error(s).
 
     5) Actor update - actor_update()
-    The actor updates apply gradient that are evaluated based on the data stored in buffers k steps ago.
+    The actor updates apply gradient that are evaluated based on the data stored in buffers K steps ago.
 
     Final notes: The algorithm admits both a batch and online implementation.
                  Communication is required only while training, not at test time.
-                 In episodic training, one can assume that the communication between agents and actor-critic updates take place at the end of an episode.
+                 In episodic batch training, one can assume that the communication between agents and actor-critic updates take place at the end of an episode.
 
     ARGUMENTS: actor (keras model)
                critic (keras model)
